@@ -1,0 +1,17 @@
+{% extends 'index.html' %}
+
+{% block body %}
+
+<h2>{{ the_title }}</h2>
+
+<p class="alert alert-info">
+    {{the_word}}
+</p>
+<p>Результат</p>
+<p class="alert alert-success">
+    {{the_result}}
+</p>
+<pre>{{date}}</pre>
+<a class="btn btn-success" href="/index">Go Back</a>
+
+{% endblock %}

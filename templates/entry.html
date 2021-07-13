@@ -1,0 +1,15 @@
+{% extends 'index.html' %}
+
+{% block body %}
+
+<h2>{{ the_title }}</h2>
+<div class="form">
+<form method='POST' action="/countthis">
+    <div class="form-group">
+      <label for="PhraseInput">Phrase</label>
+      <input type="text" class="form-control" id="PhraseInput" name='PhraseInput' placeholder="Your Phrase">
+    </div>
+    <button type="submit" class="btn btn-primary">Count It!</button>
+</form>
+</div>
+{% endblock %}
