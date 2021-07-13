@@ -1,0 +1,29 @@
+{% extends 'index.html' %}
+
+{% block body %}
+
+<h2>{{ the_title }}</h2>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">date</th>
+      <th scope="col">request</th>
+      <th scope="col">ip</th>
+      <th scope="col">client</th>
+      <th scope="col">word</th>
+      <th scope="col">result</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for log_row in the_data %}
+        <tr>
+            {% for item in log_row %}
+                <td>{{ item }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

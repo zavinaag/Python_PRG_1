@@ -10,13 +10,18 @@ logging_meta = dict()
 def log_request(req: 'flask_request', res: str) -> None:
     datetimen = now.strftime("%Y:%m:%d") + " " + now.strftime("%H:%M:%S")
     with open('log.txt', 'a') as log:
-        print('date: ' + datetimen, req.form, req.remote_addr, req.user_agent, req.form['PhraseInput'], res, file=log, sep='|')
+        print(datetimen, req.form, req.remote_addr, req.user_agent, req.form['PhraseInput'], res, file=log, sep='|')
 
 def view_the_log() -> str:
     try:
+        contents = []
         with open('log.txt') as log:
-            contents = log.readlines()
-        return escape(''.join(contents))
+            for line in log:
+                contents.append([])
+                for item in line.split('|'):
+                    contents[-1].append(escape(item))
+        return render_template('log.html', the_title='Log View', the_data=contents)
+
     except FileNotFoundError:
         print("No such file log.txt")
 
