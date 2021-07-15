@@ -48,9 +48,9 @@ def index_page() -> 'html':
 @app.route('/countthis', methods=['POST'])
 def web_count() -> str:
     try:
-        the_result = ccount(request.form['PhraseInput'])
-        log_request(request, the_result)
-        if request.form['PhraseInput'] != '':
+        if request.form['PhraseInput'].strip() != '':
+            the_result = ccount(request.form['PhraseInput'])
+            log_request(request, the_result)
             return render_template('result.html', the_title='Результат обработки', the_word=request.form['PhraseInput'],
                                    the_result=the_result)
         else:
