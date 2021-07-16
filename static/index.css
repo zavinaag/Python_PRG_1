@@ -1,5 +1,8 @@
 body {
-    background-color:bisque; 
+    background-image: url(bg.jpg) ;
+    background-size: 100%;
+    background-color: #8022cc;
+    background-blend-mode: screen;
 }
 
 .form {
