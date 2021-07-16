@@ -1,4 +1,5 @@
 import sqlite3
+from DBcm import DBcm
 
 
 def connect():
@@ -41,6 +42,20 @@ def log_event_ins(log_date_time, word, result, ip, browser):
     con.commit()
 
 
+def log_event_ins_dbcm(log_date_time, word, result, ip, browser):
+    iparam = {'database': 'webapp.db'}
+    with DBcm(iparam) as cur:
+        _SQL = """INSERT INTO log_dbcm (
+                        log_date_time,
+                        word,
+                        result,
+                        ip,
+                        browser
+                    )
+                    VALUES ( ?, ?, ?, ?, ? );"""
+        cur.execute(_SQL, (str(log_date_time), str(word), str(result), str(ip), str(browser)))
+
+
 def log_event_get() -> list:
     con = connect()
     cur = con.cursor()
@@ -50,5 +65,3 @@ def log_event_get() -> list:
     for row in cur.fetchall():
         res.append(row)
     return res
-
-

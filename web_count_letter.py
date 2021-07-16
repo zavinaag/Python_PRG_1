@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, escape
 from datetime import date, datetime
 from count_letter import ccount
-from dbinterface import log_event_ins, log_event_get
+from dbinterface import log_event_ins, log_event_get, log_event_ins_dbcm
 
 app = Flask(__name__)
 
@@ -9,11 +9,18 @@ now = datetime.now()
 logging_meta = dict()
 
 
+def get_datetimen() -> str:
+    return str(now.strftime("%Y:%m:%d") + " " + now.strftime("%H:%M:%S"))
+
+
 def log_request(req: 'flask_request', res: str) -> None:
-    datetimen = now.strftime("%Y:%m:%d") + " " + now.strftime("%H:%M:%S")
     with open('log.txt', 'a') as log:
-        print(datetimen, req.remote_addr, req.user_agent.browser, req.form['PhraseInput'], res, file=log, sep='|')
-    log_event_ins(datetimen, req.form['PhraseInput'], res, req.remote_addr, req.user_agent.browser)
+        print(get_datetimen(), req.remote_addr, req.user_agent.browser, req.form['PhraseInput'], res, file=log, sep='|')
+    log_event_ins(get_datetimen(), req.form['PhraseInput'], res, req.remote_addr, req.user_agent.browser)
+
+
+def log_request_dbcm(req: 'flask_request', res: str) -> None:
+    log_event_ins_dbcm(get_datetimen(), req.form['PhraseInput'], res, req.remote_addr, req.user_agent.browser)
 
 
 def view_the_log() -> str:
@@ -51,6 +58,7 @@ def web_count() -> str:
         if request.form['PhraseInput'].strip() != '':
             the_result = ccount(request.form['PhraseInput'])
             log_request(request, the_result)
+            log_request_dbcm(request, the_result)
             return render_template('result.html', the_title='Результат обработки', the_word=request.form['PhraseInput'],
                                    the_result=the_result)
         else:
