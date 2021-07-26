@@ -44,7 +44,7 @@ def log_event_ins(log_date_time, word, result, ip, browser):
 
 def log_event_ins_dbcm(log_date_time, word, result, ip, browser, appconfig:dict):
     # iparam = {'database': 'webapp.db'}
-    with DBcm(appconfig['database']) as cur:
+    with DBcm(appconfig) as cur:
         _SQL = """INSERT INTO log_dbcm (
                         log_date_time,
                         word,
