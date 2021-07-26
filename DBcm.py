@@ -7,7 +7,7 @@ class DBcm:
     def __init__(self, iparam: dict) -> None:
         self.configuration = iparam
 
-    def __enter__(self) -> 'cursor':
+    def __enter__(self):
         try:
             self.conn = sqlite3.connect(self.configuration['database'])
             self.cursor = self.conn.cursor()
