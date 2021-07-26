@@ -8,6 +8,8 @@ app = Flask(__name__)
 now = datetime.now()
 logging_meta = dict()
 
+app.config['dbconfig'] = {'database': 'webapp.db'}
+
 
 def get_datetimen() -> str:
     return str(now.strftime("%Y:%m:%d") + " " + now.strftime("%H:%M:%S"))
@@ -20,7 +22,7 @@ def log_request(req: 'flask_request', res: str) -> None:
 
 
 def log_request_dbcm(req: 'flask_request', res: str) -> None:
-    log_event_ins_dbcm(get_datetimen(), req.form['PhraseInput'], res, req.remote_addr, req.user_agent.browser)
+    log_event_ins_dbcm(get_datetimen(), req.form['PhraseInput'], res, req.remote_addr, req.user_agent.browser, app.config['dbconfig'])
 
 
 def view_the_log() -> str:
