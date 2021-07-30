@@ -1,0 +1,13 @@
+body,html {
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+}
+
+.wrapper {
+height: 100%;
+}
+
+.user_log_form {
+height: 100%;
+}

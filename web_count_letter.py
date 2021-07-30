@@ -33,7 +33,45 @@ def log_request_dbcm(req, res) -> None:
                        app.config['dbconfig'])
 
 
-def view_the_log() -> str:
+@app.route('/')
+def hello_flask() -> '302':
+    return redirect('/index')
+
+
+@app.route('/index')
+def index_page():
+    if 'logged_in' and 'user' in session:
+        return render_template("entry.html", the_title='Подсчет вхождений букв в слово или фразу',
+                               user=get_session_user())
+    else:
+        return redirect('/lgf')
+
+
+@app.route('/countthis', methods=['POST'])
+def web_count() -> str:
+    try:
+        if request.form['PhraseInput'].strip() != '':
+            the_result = ccount(request.form['PhraseInput'])
+            log_request(request, the_result)
+            log_request_dbcm(request, the_result)
+
+            if 'logged_in' and 'user' in session:
+                return render_template('result.html', the_title='Результат обработки',
+                                       the_word=request.form['PhraseInput'],
+                                       the_result=the_result, user=session['user'])
+            else:
+                return render_template('result.html', the_title='Результат обработки',
+                                       the_word=request.form['PhraseInput'],
+                                       the_result=the_result, user='Guest')
+        else:
+            return redirect('/index')
+    except FileNotFoundError:
+        print("No such file log.txt")
+
+
+@app.route('/viewlog')
+@check_logged_in
+def get_log() -> str:
     try:
         contents = []
         with open('log.txt') as log:
@@ -46,80 +84,46 @@ def view_the_log() -> str:
         print("No such file log.txt")
 
 
-def view_the_log_db() -> str:
+@app.route('/viewlogdb')
+@check_logged_in
+def get_log_db() -> str:
     res = log_event_get()
     return render_template('log.html', the_title='Log View DB', the_data=res, user=get_session_user())
 
 
-@app.route('/')
-def hello_flask() -> '302':
-    return redirect('/index')
+# @app.route('/login')
+# def set_session_user_an(user='Anomimous'):
+#     session['logged_in'] = True
+#     session['user'] = user
+#     return redirect('/index')
 
 
-@app.route('/index')
-def index_page():
-    if 'logged_in' and 'user' in session:
-        return render_template("entry.html", the_title='Подсчет вхождений букв в слово или фразу',
-                               user=get_session_user())
+@app.route('/lgf')
+def user_login_form():
+    return render_template('user_login_form.html', title="Авторизация пользователя")
+
+
+@app.route('/login', methods=['POST'])
+def set_session_user():
+    print("=======================")
+    print(request.form)
+    print("=======================")
+    session['logged_in'] = True
+
+    if (request.form['user'] == ''):
+        session['user'] = 'Anonimous'
     else:
-        return render_template("entry.html", the_title='Подсчет вхождений букв в слово или фразу', user='Guest')
-
-
-@app.route('/countthis', methods=['POST'])
-def web_count() -> str:
-    try:
-        if request.form['PhraseInput'].strip() != '':
-            the_result = ccount(request.form['PhraseInput'])
-            log_request(request, the_result)
-            log_request_dbcm(request, the_result)
-
-            if 'logged_in' and 'user' in session:
-                return render_template('result.html', the_title='Результат обработки', the_word=request.form['PhraseInput'],
-                                   the_result=the_result, user=session['user'])
-            else:
-                return render_template('result.html', the_title='Результат обработки', the_word=request.form['PhraseInput'],
-                                   the_result=the_result, user='Guest')
-        else:
-            return redirect('/index')
-    except FileNotFoundError:
-        print("No such file log.txt")
-
-
-
-@app.route('/viewlog')
-@check_logged_in
-def get_log() -> str:
-    return view_the_log()
-
-
-@app.route('/viewlogdb')
-@check_logged_in
-def get_log_db() -> str:
-    return view_the_log_db()
-
-
-@app.route('/login')
-def set_session_user_an(user='Anomimous'):
-    session['logged_in'] = True
-    session['user'] = user
-    return redirect('/index')
-
-
-@app.route('/login/<user>')
-def set_session_user(user: str):
-    session['logged_in'] = True
-    session['user'] = user
+        session['user'] = request.form['user']
     return redirect('/index')
 
 
 @app.route('/logout')
+@check_logged_in
 def logout():
     if 'logged_in' and 'user' in session:
         session.pop('logged_in')
         session.pop('user')
-        return 'You are logged out'
-    else:
-        return 'You are logged out'
+    return redirect('/')
 
 
 @app.route('/accden')
