@@ -12,13 +12,16 @@
         <body>
         <div class="container">
             <nav class="navbar navbar-light bg-transparent">
-                <div class="container-fluid">
-                  <a href="#" class="navbar-brand">
-                    <div class="profileuser d-inline-block align-text-top"></div>
-                    {% block nav %}
+                <div class="container-fluid nav-container">
+                      <div class="profile_wrapper">
+                        <div class="profileuser d-inline-block align-text-top"></div>
+                        <span>{{ user }}</span>
+                      </div>
+                      <div class="nav-i">
+                        {% block nav %}
 
-                    {% endblock %}
-                  </a>
+                        {% endblock %}
+                      </div>
                 </div>
               </nav>            
             <div class="row justify-content-center">

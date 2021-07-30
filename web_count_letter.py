@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, escape, session
 from datetime import date, datetime
 from count_letter import ccount
 from dbinterface import log_event_ins, log_event_get, log_event_ins_dbcm
+from m_checker import check_logged_in
 
 app = Flask(__name__)
 
@@ -21,12 +22,6 @@ def get_session_user() -> str:
     return session['user']
 
 
-def set_session_user(user: str) -> str:
-    session['user'] = user
-    return session['user']
-
-
-
 def log_request(req, res) -> None:
     with open('log.txt', 'a') as log:
         print(get_datetimen(), req.remote_addr, req.user_agent.browser, req.form['PhraseInput'], res, file=log, sep='|')
@@ -34,7 +29,8 @@ def log_request(req, res) -> None:
 
 
 def log_request_dbcm(req, res) -> None:
-    log_event_ins_dbcm(get_datetimen(), req.form['PhraseInput'], res, req.remote_addr, req.user_agent.browser, app.config['dbconfig'])
+    log_event_ins_dbcm(get_datetimen(), req.form['PhraseInput'], res, req.remote_addr, req.user_agent.browser,
+                       app.config['dbconfig'])
 
 
 def view_the_log() -> str:
@@ -45,15 +41,14 @@ def view_the_log() -> str:
                 contents.append([])
                 for item in line.split('|'):
                     contents[-1].append(escape(item))
-        return render_template('log.html', the_title='Log View', the_data=contents, user = get_session_user())
-
+        return render_template('log.html', the_title='Log View', the_data=contents, user=get_session_user())
     except FileNotFoundError:
         print("No such file log.txt")
 
 
 def view_the_log_db() -> str:
     res = log_event_get()
-    return render_template('log.html', the_title='Log View DB', the_data=res, user = get_session_user())
+    return render_template('log.html', the_title='Log View DB', the_data=res, user=get_session_user())
 
 
 @app.route('/')
@@ -63,8 +58,11 @@ def hello_flask() -> '302':
 
 @app.route('/index')
 def index_page():
-    set_session_user('Anomimous')
-    return render_template("entry.html", the_title='Подсчет вхождений букв в слово или фразу', user = get_session_user())
+    if 'logged_in' and 'user' in session:
+        return render_template("entry.html", the_title='Подсчет вхождений букв в слово или фразу',
+                               user=get_session_user())
+    else:
+        return render_template("entry.html", the_title='Подсчет вхождений букв в слово или фразу', user='Guest')
 
 
 @app.route('/countthis', methods=['POST'])
@@ -74,22 +72,66 @@ def web_count() -> str:
             the_result = ccount(request.form['PhraseInput'])
             log_request(request, the_result)
             log_request_dbcm(request, the_result)
-            return render_template('result.html', the_title='Результат обработки', the_word=request.form['PhraseInput'],
-                                   the_result=the_result, user = session['user'])
+
+            if 'logged_in' and 'user' in session:
+                return render_template('result.html', the_title='Результат обработки', the_word=request.form['PhraseInput'],
+                                   the_result=the_result, user=session['user'])
+            else:
+                return render_template('result.html', the_title='Результат обработки', the_word=request.form['PhraseInput'],
+                                   the_result=the_result, user='Guest')
         else:
             return redirect('/index')
     except FileNotFoundError:
         print("No such file log.txt")
 
 
+
 @app.route('/viewlog')
+@check_logged_in
 def get_log() -> str:
     return view_the_log()
 
 
 @app.route('/viewlogdb')
+@check_logged_in
 def get_log_db() -> str:
     return view_the_log_db()
+
+
+@app.route('/login')
+def set_session_user_an(user='Anomimous'):
+    session['logged_in'] = True
+    session['user'] = user
+    return redirect('/index')
+
+
+@app.route('/login/<user>')
+def set_session_user(user: str):
+    session['logged_in'] = True
+    session['user'] = user
+    return redirect('/index')
+
+
+@app.route('/logout')
+def logout():
+    if 'logged_in' and 'user' in session:
+        session.pop('logged_in')
+        session.pop('user')
+        return 'You are logged out'
+    else:
+        return 'You are logged out'
+
+
+@app.route('/accden')
+def accden():
+    return render_template("accden.html", the_title='')
+
+
+@app.route('/status')
+def check_status() -> str:
+    if 'logged_in' and 'user' in session:
+        return 'You logged in currently as ' + session['user']
+    return 'You are not logged in currently'
 
 
 if __name__ == '__main__':

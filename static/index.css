@@ -17,3 +17,27 @@ body {
     background-image: url(profile.jpg);
     background-size: contain;
 }
+
+.nav-i {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: space-between;
+    align-items: center;
+    width: 150px;
+}
+
+.nav-container {
+    display: flex;
+    align-items: baseline  !important;
+    justify-content: space-around !important;
+}
+
+.profile_wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-right: 100px;
+   }

@@ -2,13 +2,14 @@
 
 
 {% block nav %}
-    <span>{{ user }}</span>
+    <a class="btn btn-success mt-5 gobackbtn" href="/login"> Login</a>
+    <a class="btn btn-success mt-5 gobackbtn" href="/logout"> Logout</a>
 {% endblock %}
 
 
 {% block body %}
 
-<h2>{{ the_title }}</h2>
+<h2 class="text-center">{{ the_title }}</h2>
 
 <a class="btn btn-success" href="/index">Go Back</a>
 <p class="alert alert-info">
