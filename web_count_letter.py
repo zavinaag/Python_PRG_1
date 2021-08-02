@@ -5,7 +5,6 @@ from dbinterface import log_event_ins, log_event_get, log_event_ins_dbcm
 from m_checker import check_logged_in
 from user_login_form import Login_form
 
-
 app = Flask(__name__)
 
 now = datetime.now()
@@ -35,7 +34,7 @@ def log_request_dbcm(req, res) -> None:
                        app.config['dbconfig'])
 
 
-def set_session(user: str, password: str = 'pass', logged_in: bool = True) -> None:
+def set_session(user: str = 'Anonimous', password: str = 'pass', logged_in: bool = True) -> None:
     session['logged_in'] = logged_in
     session['password'] = password
     session['user'] = user
@@ -115,12 +114,10 @@ def user_login_form_wtf():
 
 @app.route('/login', methods=['POST'])
 def set_session_user():
-    session['logged_in'] = True
-    session['password'] = request.form['password']
     if (not request.form['user']):
-        session['user'] = 'Anonimous'
+        set_session()
     else:
-        session['user'] = request.form['user']
+        set_session(password=request.form['password'], user=request.form['user'])
     return redirect('/index')
 
 
@@ -128,16 +125,13 @@ def set_session_user():
 def set_session_user2():
     ulfw = Login_form()
     if ulfw.validate_on_submit():
-        session['logged_in'] = True
-        session['password'] = request.form['password']
         if (not ulfw.user.data):
             return redirect('/lgf2')
         else:
-            session['user'] = ulfw.user.data
+            set_session(password=ulfw.password.data, user=ulfw.user.data)
         return redirect('/index')
     else:
-        session['user'] = 'Anonimous'
-        session['logged_in'] = True
+        set_session()
         return redirect('/index')
 
 
