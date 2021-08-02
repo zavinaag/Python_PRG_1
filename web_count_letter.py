@@ -3,6 +3,8 @@ from datetime import datetime
 from count_letter import ccount
 from dbinterface import log_event_ins, log_event_get, log_event_ins_dbcm
 from m_checker import check_logged_in
+from user_login_form import Login_form
+
 
 app = Flask(__name__)
 
@@ -71,7 +73,7 @@ def web_count() -> str:
 
 @app.route('/viewlog')
 @check_logged_in
-def get_log() -> str:
+def get_log() -> 'html':
     try:
         contents = []
         with open('log.txt') as log:
@@ -86,22 +88,25 @@ def get_log() -> str:
 
 @app.route('/viewlogdb')
 @check_logged_in
-def get_log_db() -> str:
+def get_log_db() -> 'html':
     res = log_event_get()
     return render_template('log.html', the_title='Log View DB', the_data=res, user=get_session_user())
 
 
-@app.route('/lgf')
+@app.route('/lgf', methods=['GET'])
 def user_login_form():
-    return render_template('user_login_form.html', title="Авторизация пользователя")
+    ulf = Login_form()
+    return render_template('user_login_form.html', title="Авторизация пользователя", form=ulf)
+
+
+@app.route('/lgf2', methods=['GET'])
+def user_login_form_wtf():
+    ulfw = Login_form()
+    return render_template('ulfw.html', form=ulfw)
 
 
 @app.route('/login', methods=['POST'])
 def set_session_user():
-    print("=======================")
-    print(request.form)
-    print(request.form['password'])
-    print("=======================")
     session['logged_in'] = True
     session['password'] = request.form['password']
     if (request.form['user'] == ''):
@@ -111,9 +116,9 @@ def set_session_user():
     return redirect('/index')
 
 
-@app.route('/logout')
+@app.route('/logout', methods=['GET'])
 @check_logged_in
-def logout():
+def logout() -> '302':
     if 'logged_in' and 'user' in session:
         session.pop('logged_in')
         session.pop('user')
@@ -121,7 +126,7 @@ def logout():
 
 
 @app.route('/accden')
-def accden():
+def accden() -> 'html':
     return render_template("accden.html", the_title='')
 
 
