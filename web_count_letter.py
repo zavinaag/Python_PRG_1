@@ -50,6 +50,7 @@ def index_page():
 
 
 @app.route('/countthis', methods=['POST'])
+@check_logged_in
 def web_count() -> str:
     try:
         if request.form['PhraseInput'].strip() != '':
