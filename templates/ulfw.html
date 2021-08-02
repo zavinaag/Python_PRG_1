@@ -15,12 +15,22 @@
                           <form method="POST" action="/login2">
                               {{ form.hidden_tag() }}
                             <div class="mb-3">
-                              <label for="exampleInputEmail1" class="form-label">User Name</label>
-                              {{ form.user(class_="form-control", id="exampleInputEmail1")}}
+                                {{ form.user.label }}
+                              {{ form.user(class_="form-control", id="exampleInputEmail1", size=50)}}
+                                {% for err in form.user.errors %}
+                                    <p> {{ err }}</p>
+                                {% endfor %}
                             </div>
                               <div class="mb-3">
-                                <label for="exampleInputPassword1" class="form-label">Password</label>
-                                {{ form.password(class_="form-control", id="exampleInputPassword1") }}
+                                {{ form.password.label }}
+                                {{ form.password(class_="form-control", id="exampleInputPassword1", size=50) }}
+                                {% for err in form.password.error %}
+                                    <p> {{ err }}</p>
+                                {% endfor %}
+                              </div>
+                              <div class="mb-3">
+                                {{ form.rec.label }}
+                                {{ form.rec }}
                               </div>
                             {{ form.submit(class_="btn btn-primary") }}
                           </form>
