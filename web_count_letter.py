@@ -35,6 +35,13 @@ def log_request_dbcm(req, res) -> None:
                        app.config['dbconfig'])
 
 
+def set_session(user: str, password: str = 'pass', logged_in: bool = True) -> None:
+    session['logged_in'] = logged_in
+    session['password'] = password
+    session['user'] = user
+    return session
+
+
 @app.route('/')
 def hello_flask() -> '302':
     return redirect('/index')
@@ -110,11 +117,28 @@ def user_login_form_wtf():
 def set_session_user():
     session['logged_in'] = True
     session['password'] = request.form['password']
-    if (request.form['user'] == ''):
+    if (not request.form['user']):
         session['user'] = 'Anonimous'
     else:
         session['user'] = request.form['user']
     return redirect('/index')
+
+
+@app.route('/login2', methods=['POST', 'GET'])
+def set_session_user2():
+    ulfw = Login_form()
+    if ulfw.validate_on_submit():
+        session['logged_in'] = True
+        session['password'] = request.form['password']
+        if (not ulfw.user.data):
+            return redirect('/lgf2')
+        else:
+            session['user'] = ulfw.user.data
+        return redirect('/index')
+    else:
+        session['user'] = 'Anonimous'
+        session['logged_in'] = True
+        return redirect('/index')
 
 
 @app.route('/logout', methods=['GET'])
